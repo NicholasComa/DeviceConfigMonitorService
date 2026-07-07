@@ -1,0 +1,9 @@
+{
+  "_comment": "DeviceConfigMonitorService 配置文件示例。将此文件复制为 config.json 并修改对应字段。",
+  "DeviceId": "DEVICE-0001",
+  "ServiceName": "DeviceConfigMonitorService",
+  "EnableHeartbeat": true,
+  "HeartbeatIntervalSeconds": 30,
+  "LogLevel": "INFO",
+  "LogPath": "C:\\ProgramData\\NanningTraining\\DeviceConfigMonitorService\\logs"
+}
