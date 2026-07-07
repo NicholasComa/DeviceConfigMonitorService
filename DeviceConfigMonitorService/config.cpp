@@ -32,9 +32,15 @@ bool EnsureConfigDirectory(const std::string& filePath) {
     for (size_t i = 0; i < pathCopy.size(); ++i) {
         current += pathCopy[i];
         if (pathCopy[i] == '\\' || i == pathCopy.size() - 1) {
+            // 跳过裸盘符 "C:" 这种无效的创建目标
+            if (current.size() == 2 && current[1] == ':' && current.back() == ':') {
+                if (pathCopy[i] == '\\') current += '\\';
+                continue;
+            }
             if (current.back() == '\\') current.pop_back();
             if (!current.empty() && !CreateDirectoryA(current.c_str(), nullptr)) {
-                if (GetLastError() != ERROR_ALREADY_EXISTS) {
+                DWORD err = GetLastError();
+                if (err != ERROR_ALREADY_EXISTS) {
                     return false;
                 }
             }
