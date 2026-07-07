@@ -24,8 +24,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="config.cpp">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件\src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
