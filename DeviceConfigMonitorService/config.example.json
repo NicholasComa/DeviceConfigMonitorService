@@ -1,0 +1,8 @@
+{
+    "DeviceId": "DEVICE-0001",
+    "ServiceName": "DeviceConfigMonitorService",
+    "EnableHeartbeat": true,
+    "HeartbeatIntervalSeconds": 30,
+    "LogLevel": "INFO",
+    "LogPath": "C:\\ProgramData\\NanningTraining\\DeviceConfigMonitorService\\logs"
+}
