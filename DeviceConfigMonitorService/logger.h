@@ -55,6 +55,9 @@ public:
     static const std::string& GetCurrentLogFile();
 
 private:
+    // 跨日检测：跨天时切换到新文件
+    static void RotateIfNeededInternal();
+
     static std::string  s_logDir;
     static std::string  s_currentFile;
     static std::ofstream s_ofs;

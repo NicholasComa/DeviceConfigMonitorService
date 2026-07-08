@@ -5,6 +5,7 @@
 #include "logger.h"
 
 #include <iostream>
+#include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
@@ -68,8 +69,8 @@ const char* LevelToString(LogLevel level) {
         case LogLevel::Info:  return "INFO";
         case LogLevel::Warn:  return "WARN";
         case LogLevel::Error: return "ERROR";
+        default:              return "?";
     }
-    return "?";
 }
 
 // 取当前时间戳：[YYYY-MM-DD HH:MM:SS.mmm]
@@ -110,20 +111,8 @@ std::string MakeLogFileName() {
 }
 
 // 跨日检测：如果文件名与今天的预期不一致，重新打开文件
-void RotateIfNeeded() {
-    std::string expected = MakeLogFileName();
-    if (expected != Logger::GetCurrentLogFile()) {
-        if (Logger::s_ofs.is_open()) {
-            Logger::s_ofs.close();
-        }
-        Logger::s_currentFile = expected;
-        std::string fullPath = Logger::s_logDir + "\\" + expected;
-        Logger::s_ofs.open(fullPath, std::ios::app);
-        if (!Logger::s_ofs.is_open()) {
-            std::cerr << "[Logger] Failed to open log file: " << fullPath << std::endl;
-        }
-    }
-}
+// 注意：不能放在匿名 namespace 里访问 Logger 私有成员
+// 改用 Logger 类的私有静态方法实现（下方 Logger::RotateIfNeededInternal）
 
 } // namespace
 
@@ -154,6 +143,22 @@ bool Logger::Init(const std::string& logDir) {
     s_initialized = true;
     std::cerr << "[Logger] Log file: " << fullPath << std::endl;
     return true;
+}
+
+// 内部：跨日时重新打开文件（Logger 类内私有友元）
+void Logger::RotateIfNeededInternal() {
+    std::string expected = MakeLogFileName();
+    if (expected != s_currentFile) {
+        if (s_ofs.is_open()) {
+            s_ofs.close();
+        }
+        s_currentFile = expected;
+        std::string fullPath = s_logDir + "\\" + expected;
+        s_ofs.open(fullPath, std::ios::app);
+        if (!s_ofs.is_open()) {
+            std::cerr << "[Logger] Failed to open log file: " << fullPath << std::endl;
+        }
+    }
 }
 
 void Logger::Shutdown() {
@@ -187,7 +192,7 @@ void Logger::Write(LogLevel level, const std::string& message) {
     }
 
     // 跨日检测：跨天时切换到新文件
-    RotateIfNeeded();
+    RotateIfNeededInternal();
 
     std::string line = "[" + CurrentTimestamp() + "] ["
                      + LevelToString(level) + "] " + message;
