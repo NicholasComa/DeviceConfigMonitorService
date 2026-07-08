@@ -3,7 +3,7 @@ setlocal
 
 set "SERVICE_NAME=DeviceConfigMonitorService"
 set "DISPLAY_NAME=Device Config Monitor Service"
-set "BIN_PATH=%~dp0..\x64\Debug\DeviceConfigMonitorService.exe"
+set "BIN_PATH=%~dp0..\..\x64\Debug\DeviceConfigMonitorService.exe"
 
 echo [install] Registering service...
 echo   Service name : %SERVICE_NAME%
