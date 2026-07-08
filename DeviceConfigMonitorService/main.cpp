@@ -16,7 +16,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-
 const std::string PROGRAM_NAME = "DeviceConfigMonitorService";
 const std::string VERSION = "1.0.0";
 
@@ -80,15 +79,16 @@ int main(int argc, char* argv[]) {
         // Windows Service 模式
         // SERVICE_TABLE_ENTRY 把服务名映射到 ServiceMain 入口
         // StartServiceCtrlDispatcher 会一直阻塞直到服务停止
-        // 注意：ServiceMain / ServiceCtrlHandler 在 service_main.h 里声明
-        //       头文件已 include <windows.h>，所以这些 Windows 类型在 main.cpp
-        //       里通过 service_main.h 间接可见
-        SERVICE_TABLE_ENTRY serviceTable[] = {
-            { (LPWSTR)L"DeviceConfigMonitorService", (LPSERVICE_MAIN_FUNCTION)ServiceMain },
+        // 注意：在新版 Windows SDK（10.0.19041+）中，SERVICE_TABLE_ENTRY
+        //       是 A/W 两个版本，默认根据 UNICODE 宏选择。
+        //       我们的 ServiceMain 签名是宽字符版（LPWSTR*），
+        //       所以显式使用 SERVICE_TABLE_ENTRYW 让两边一致。
+        SERVICE_TABLE_ENTRYW serviceTable[] = {
+            { L"DeviceConfigMonitorService", (LPSERVICE_MAIN_FUNCTIONW)ServiceMain },
             { nullptr, nullptr }
         };
 
-        if (!StartServiceCtrlDispatcher(serviceTable)) {
+        if (!StartServiceCtrlDispatcherW(serviceTable)) {
             // 启动失败：可能是 SCM 不可用（比如直接双击 exe 而不是用 services.msc）
             // 这里写 stderr 而不是调 Logger，因为 Logger 还未初始化
             std::cerr << "StartServiceCtrlDispatcher failed. "
