@@ -1,10 +1,4 @@
 @echo off
-REM ============================================================
-REM query.bat - Query DeviceConfigMonitorService status
-REM ============================================================
-REM Run as Administrator.
-REM ============================================================
-
 setlocal
 
 set "SERVICE_NAME=DeviceConfigMonitorService"

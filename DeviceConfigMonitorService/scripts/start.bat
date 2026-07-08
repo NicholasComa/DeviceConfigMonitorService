@@ -1,10 +1,4 @@
 @echo off
-REM ============================================================
-REM start.bat - Start DeviceConfigMonitorService
-REM ============================================================
-REM Run as Administrator.
-REM ============================================================
-
 setlocal
 
 set "SERVICE_NAME=DeviceConfigMonitorService"
@@ -19,7 +13,7 @@ if errorlevel 1 (
 
 sc start %SERVICE_NAME%
 if errorlevel 1 (
-    echo [ERROR] sc start failed. Did you run as Administrator?
+    echo [ERROR] sc start failed. Run as Administrator?
     exit /b 1
 )
 

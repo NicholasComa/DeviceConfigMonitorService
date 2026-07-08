@@ -1,10 +1,4 @@
 @echo off
-REM ============================================================
-REM stop.bat - Stop DeviceConfigMonitorService
-REM ============================================================
-REM Run as Administrator.
-REM ============================================================
-
 setlocal
 
 set "SERVICE_NAME=DeviceConfigMonitorService"
@@ -19,7 +13,7 @@ if errorlevel 1 (
 
 sc stop %SERVICE_NAME%
 if errorlevel 1 (
-    echo [ERROR] sc stop failed. Did you run as Administrator?
+    echo [ERROR] sc stop failed. Run as Administrator?
     exit /b 1
 )
 
