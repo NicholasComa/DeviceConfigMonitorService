@@ -84,7 +84,9 @@ int main(int argc, char* argv[]) {
         //       我们的 ServiceMain 签名是宽字符版（LPWSTR*），
         //       所以显式使用 SERVICE_TABLE_ENTRYW 让两边一致。
         SERVICE_TABLE_ENTRYW serviceTable[] = {
-            { L"DeviceConfigMonitorService", (LPSERVICE_MAIN_FUNCTIONW)ServiceMain },
+            // L"..." 是 const，但 lpServiceName 字段是 LPWSTR（非 const）
+            // SCM 不会修改这个字符串，const_cast 是安全的
+            { const_cast<LPWSTR>(L"DeviceConfigMonitorService"), (LPSERVICE_MAIN_FUNCTIONW)ServiceMain },
             { nullptr, nullptr }
         };
 
