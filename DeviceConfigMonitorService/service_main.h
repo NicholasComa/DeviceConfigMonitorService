@@ -12,6 +12,8 @@
 
 #include <atomic>
 
+// Windows types needed for ServiceMain / ServiceCtrlHandler signatures.
+// Always include on Windows; the project is Windows-only anyway.
 #ifdef _WIN32
 #include <windows.h>   // WINAPI, DWORD, LPWSTR, SERVICE_STATUS, ...
 #endif
@@ -26,11 +28,11 @@
 // 内部循环每 200ms 检查一次 stopFlag，最长退出延迟 200ms
 void RunServiceBody(std::atomic<bool>& stopFlag);
 
-#ifdef _WIN32
 // Windows Service 入口（被 SCM 调用，**不直接由 main 调用**）
 // 注册 ServiceCtrlHandler + 启动主循环
+// 注意：LPSERVICE_MAIN_FUNCTION 是 windows.h 定义的函数指针类型
+//       函数签名必须与 LPSERVICE_MAIN_FUNCTION 完全匹配
 void WINAPI ServiceMain(DWORD argc, LPWSTR* argv);
 
 // 控制回调：响应 SERVICE_CONTROL_STOP / SERVICE_CONTROL_SHUTDOWN
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode);
-#endif

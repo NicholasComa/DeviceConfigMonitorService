@@ -80,6 +80,9 @@ int main(int argc, char* argv[]) {
         // Windows Service 模式
         // SERVICE_TABLE_ENTRY 把服务名映射到 ServiceMain 入口
         // StartServiceCtrlDispatcher 会一直阻塞直到服务停止
+        // 注意：ServiceMain / ServiceCtrlHandler 在 service_main.h 里声明
+        //       头文件已 include <windows.h>，所以这些 Windows 类型在 main.cpp
+        //       里通过 service_main.h 间接可见
         SERVICE_TABLE_ENTRY serviceTable[] = {
             { (LPWSTR)L"DeviceConfigMonitorService", (LPSERVICE_MAIN_FUNCTION)ServiceMain },
             { nullptr, nullptr }
