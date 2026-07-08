@@ -128,12 +128,18 @@ void WINAPI ServiceMain(DWORD /*argc*/, LPWSTR* /*argv*/) {
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode) {
     switch (ctrlCode) {
         case SERVICE_CONTROL_STOP:
-        case SERVICE_CONTROL_SHUTDOWN:
             // 1) 先上报 STOP_PENDING
             g_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
             SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
 
             // 2) 置位停止标志，业务循环会退出
+            g_serviceStopRequested.store(true);
+            break;
+
+        case SERVICE_CONTROL_SHUTDOWN:
+            // 系统关停时同样要优雅退出
+            g_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
+            SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
             g_serviceStopRequested.store(true);
             break;
 
