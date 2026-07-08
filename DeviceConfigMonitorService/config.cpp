@@ -13,7 +13,7 @@
 
 namespace {
 
-// 创建配置文件所在目录（递归创建多级目录）
+// Recursively create the directory containing the config file
 bool EnsureConfigDirectory(const std::string& filePath) {
     size_t lastSlash = filePath.find_last_of("\\/");
     if (lastSlash == std::string::npos) {
@@ -32,11 +32,11 @@ bool EnsureConfigDirectory(const std::string& filePath) {
     for (size_t i = 0; i < pathCopy.size(); ++i) {
         current += pathCopy[i];
         if (pathCopy[i] == '\\' || i == pathCopy.size() - 1) {
-            // 去掉末尾的 \，得到待创建的目录名
+            // Strip trailing backslash to get the directory name to create
             if (current.back() == '\\') {
                 current.pop_back();
             }
-            // 跳过裸盘符 "C:" / "D:" 这种无效的 CreateDirectory 目标
+            // Skip bare drive letters like "C:" / "D:" which are invalid CreateDirectory targets
             bool isBareDrive = (current.size() == 2 && current[1] == ':');
             if (!isBareDrive && !current.empty()
                 && !CreateDirectoryA(current.c_str(), nullptr)) {
@@ -58,7 +58,7 @@ bool EnsureConfigDirectory(const std::string& filePath) {
 #endif
 }
 
-// 生成默认配置
+// Generate default configuration
 AppConfig GetDefaultConfig() {
     AppConfig cfg;
     cfg.DeviceId     = "DEVICE-0001";

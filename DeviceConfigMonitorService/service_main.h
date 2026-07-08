@@ -19,20 +19,20 @@
 #endif
 
 //============================================================================
-// 公共 API
+// Public API
 //============================================================================
 
-// 业务主体（控制台模式 / 服务模式共用）
-// 流程：LoadConfig → Logger::Init → HeartbeatWorker.Start → 主循环 → 优雅停止
-// stopFlag 由调用方控制：控制台模式下是 Ctrl+C atomic，服务模式下是 CtrlHandler 触发
-// 内部循环每 200ms 检查一次 stopFlag，最长退出延迟 200ms
+// Shared business body (used by both console and service modes)
+// Flow: LoadConfig -> Logger::Init -> HeartbeatWorker.Start -> main loop -> graceful shutdown
+// stopFlag is controlled by the caller: Ctrl+C atomic in console mode, CtrlHandler in service mode
+// Inner loop checks stopFlag every 200ms; worst-case exit latency is 200ms
 void RunServiceBody(std::atomic<bool>& stopFlag);
 
-// Windows Service 入口（被 SCM 调用，**不直接由 main 调用**）
-// 注册 ServiceCtrlHandler + 启动主循环
-// 注意：LPSERVICE_MAIN_FUNCTION 是 windows.h 定义的函数指针类型
-//       函数签名必须与 LPSERVICE_MAIN_FUNCTION 完全匹配
+// Windows Service entry point (called by SCM, **not directly from main**)
+// Registers ServiceCtrlHandler + starts the main loop
+// Note: LPSERVICE_MAIN_FUNCTION is a function-pointer type defined in windows.h
+//       The function signature must exactly match LPSERVICE_MAIN_FUNCTION
 void WINAPI ServiceMain(DWORD argc, LPWSTR* argv);
 
-// 控制回调：响应 SERVICE_CONTROL_STOP / SERVICE_CONTROL_SHUTDOWN
+// Control callback: handles SERVICE_CONTROL_STOP / SERVICE_CONTROL_SHUTDOWN
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode);

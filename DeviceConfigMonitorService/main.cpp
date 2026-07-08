@@ -19,10 +19,10 @@
 const std::string PROGRAM_NAME = "DeviceConfigMonitorService";
 const std::string VERSION = "1.0.0";
 
-// 控制台模式专用停止标志
+// Console-mode-specific stop flag
 static std::atomic<bool> g_consoleStopRequested{false};
 
-// Ctrl+C 信号处理：让 while 循环体优雅退出
+// Ctrl+C signal handler: triggers graceful exit of the while loop
 static void ConsoleSignalHandler(int /*signum*/) {
     g_consoleStopRequested.store(true);
 }
@@ -57,42 +57,43 @@ int main(int argc, char* argv[]) {
     if (consoleMode) {
         printBanner();
 
-        // 注册 Ctrl+C 处理
+        // Register Ctrl+C handler
         std::signal(SIGINT, ConsoleSignalHandler);
         std::signal(SIGTERM, ConsoleSignalHandler);
 
-        // 打印配置摘要（控制台模式特色）
+        // Print config summary (console-mode feature)
         AppConfig previewConfig = LoadConfig();
         PrintConfigSummary(previewConfig);
-        // 注意：LoadConfig 之后 config.json 已经被读取，
-        //       RunServiceBody 里会再读一次。性能上没问题（IO 很轻）。
+        // Note: LoadConfig already reads config.json;
+        //       RunServiceBody will read it again. That is fine (IO is lightweight).
 
         std::cout << "Service is running. Press Ctrl+C to stop." << std::endl;
         std::cout << std::endl;
 
-        // 共用业务主体
+        // Shared business body
         RunServiceBody(g_consoleStopRequested);
 
         std::cout << "Service stopped gracefully." << std::endl;
     }
     else {
-        // Windows Service 模式
-        // SERVICE_TABLE_ENTRY 把服务名映射到 ServiceMain 入口
-        // StartServiceCtrlDispatcher 会一直阻塞直到服务停止
-        // 注意：在新版 Windows SDK（10.0.19041+）中，SERVICE_TABLE_ENTRY
-        //       是 A/W 两个版本，默认根据 UNICODE 宏选择。
-        //       我们的 ServiceMain 签名是宽字符版（LPWSTR*），
-        //       所以显式使用 SERVICE_TABLE_ENTRYW 让两边一致。
+        // Windows Service mode
+        // SERVICE_TABLE_ENTRY maps the service name to the ServiceMain entry point
+        // StartServiceCtrlDispatcher blocks until the service stops
+        // Note: In newer Windows SDK (10.0.19041+), SERVICE_TABLE_ENTRY
+        //       has A and W variants, selected by the UNICODE macro.
+        //       Our ServiceMain signature uses the wide-char version (LPWSTR*),
+        //       so we explicitly use SERVICE_TABLE_ENTRYW for consistency.
         SERVICE_TABLE_ENTRYW serviceTable[] = {
-            // L"..." 是 const，但 lpServiceName 字段是 LPWSTR（非 const）
-            // SCM 不会修改这个字符串，const_cast 是安全的
+            // L"..." is const, but lpServiceName is LPWSTR (non-const)
+            // SCM never modifies this string, so const_cast is safe
             { const_cast<LPWSTR>(L"DeviceConfigMonitorService"), (LPSERVICE_MAIN_FUNCTIONW)ServiceMain },
             { nullptr, nullptr }
         };
 
         if (!StartServiceCtrlDispatcherW(serviceTable)) {
-            // 启动失败：可能是 SCM 不可用（比如直接双击 exe 而不是用 services.msc）
-            // 这里写 stderr 而不是调 Logger，因为 Logger 还未初始化
+            // Start failed: possible causes include SCM being unavailable
+            // (e.g. running the exe directly instead of via services.msc)
+            // Write to stderr instead of calling Logger because Logger is not initialized yet
             std::cerr << "StartServiceCtrlDispatcher failed. "
                       << "If you want to run in console mode, use --console flag." << std::endl;
             return 1;

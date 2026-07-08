@@ -8,7 +8,7 @@
 #include <chrono>
 
 //============================================================================
-// 常量
+// Constants
 //============================================================================
 namespace {
 constexpr int DEFAULT_HEARTBEAT_INTERVAL_SECONDS = 5;
@@ -35,14 +35,14 @@ int HeartbeatWorker::NormalizeInterval(int seconds) {
 
 void HeartbeatWorker::Start(const AppConfig& config) {
     if (running_.load()) {
-        return; // 已经在跑
+        return; // already running
     }
 
     config_         = config;
     stopRequested_  = false;
 
     if (!config_.EnableHeartbeat) {
-        // 配置要求关闭心跳：不启动线程
+        // Config disables heartbeat: do not start the thread
         Logger::Info("Heartbeat is disabled (EnableHeartbeat=false).");
         return;
     }
@@ -71,19 +71,19 @@ void HeartbeatWorker::Stop() {
 void HeartbeatWorker::Loop() {
     int interval = NormalizeInterval(config_.HeartbeatIntervalSeconds);
 
-    // 第一次立刻发一条，然后按 interval 周期循环
+    // Emit one heartbeat immediately, then cycle on the interval
     auto nextTime = std::chrono::steady_clock::now();
 
     while (!stopRequested_.load()) {
-        // 写一条心跳
+        // Write a heartbeat entry
         Logger::Info("[Heartbeat] DeviceId=" + config_.DeviceId
                      + ", ServiceName=" + config_.ServiceName);
 
-        // 推进到下一次时间点
+        // Advance to the next time point
         nextTime += std::chrono::seconds(interval);
 
-        // 短间隔 sleep + 检查停止标志（避免大间隔下响应慢）
-        // 每次最多睡 200ms，多次检查
+        // Short-interval sleep + stop flag check (avoids slow exit on long intervals)
+        // Sleep at most 200ms per iteration, checking frequently
         while (!stopRequested_.load()) {
             auto now = std::chrono::steady_clock::now();
             if (now >= nextTime) break;

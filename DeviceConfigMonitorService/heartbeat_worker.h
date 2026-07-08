@@ -17,29 +17,29 @@
 #include "config.h"
 
 //============================================================================
-// HeartbeatWorker - 后台心跳线程
+// HeartbeatWorker - background heartbeat thread
 //============================================================================
 class HeartbeatWorker {
 public:
     HeartbeatWorker();
     ~HeartbeatWorker();
 
-    // 启动：传入配置（拷贝一份避免外部生命周期问题）
-    // 内部根据 EnableHeartbeat 决定是否真正开线程
+    // Start: takes a copy of the config (avoids external lifetime issues)
+    // Internally decides whether to actually start the thread based on EnableHeartbeat
     void Start(const AppConfig& config);
 
-    // 停止：设置停止标志 + join 线程
-    // 多次调用安全
+    // Stop: set stop flag + join thread
+    // Safe to call multiple times
     void Stop();
 
-    // 是否正在运行
+    // Whether the worker is currently running
     bool IsRunning() const { return running_.load(); }
 
 private:
-    // 线程主循环
+    // Thread main loop
     void Loop();
 
-    // 工具：把间隔规整为合法值（<=0 → 5）
+    // Helper: normalize interval to a valid value (<=0 → 5)
     static int NormalizeInterval(int seconds);
 
     std::thread        thread_;

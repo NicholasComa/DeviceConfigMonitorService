@@ -15,7 +15,7 @@
 #endif
 
 //============================================================================
-// 静态成员定义
+// Static member definitions
 //============================================================================
 std::string   Logger::s_logDir;
 std::string   Logger::s_currentFile;
@@ -24,7 +24,8 @@ std::mutex    Logger::s_mutex;
 bool          Logger::s_initialized = false;
 
 //============================================================================
-// 内部工具：递归创建目录（沿用 config.cpp 的修复版，跳过裸盘符）
+// Internal helper: create directory recursively
+// (Uses the same fix as config.cpp: skip bare drive letters)
 //============================================================================
 namespace {
 
@@ -42,7 +43,7 @@ bool EnsureDirectory(const std::string& dirPath) {
             if (current.back() == '\\') {
                 current.pop_back();
             }
-            // 跳过裸盘符 "C:" / "D:"
+            // Skip bare drive letters "C:" / "D:"
             bool isBareDrive = (current.size() == 2 && current[1] == ':');
             if (!isBareDrive && !current.empty()
                 && !CreateDirectoryA(current.c_str(), nullptr)) {
@@ -63,7 +64,7 @@ bool EnsureDirectory(const std::string& dirPath) {
 #endif
 }
 
-// 等级 → 字符串
+// Level -> string
 const char* LevelToString(LogLevel level) {
     switch (level) {
         case LogLevel::Info:  return "INFO";
@@ -73,7 +74,7 @@ const char* LevelToString(LogLevel level) {
     }
 }
 
-// 取当前时间戳：[YYYY-MM-DD HH:MM:SS.mmm]
+// Get current timestamp: [YYYY-MM-DD HH:MM:SS.mmm]
 std::string CurrentTimestamp() {
     using namespace std::chrono;
     auto now    = system_clock::now();
@@ -93,7 +94,7 @@ std::string CurrentTimestamp() {
     return oss.str();
 }
 
-// 生成当天日志文件名：service-YYYY-MM-DD.log
+// Generate today's log file name: service-YYYY-MM-DD.log
 std::string MakeLogFileName() {
     using namespace std::chrono;
     auto now = system_clock::now();
@@ -110,27 +111,27 @@ std::string MakeLogFileName() {
     return oss.str();
 }
 
-// 跨日检测：如果文件名与今天的预期不一致，重新打开文件
-// 注意：不能放在匿名 namespace 里访问 Logger 私有成员
-// 改用 Logger 类的私有静态方法实现（下方 Logger::RotateIfNeededInternal）
+// Cross-day detection: if the file name differs from today's expected name, reopen the file
+// Note: This cannot access Logger private members from inside an anonymous namespace,
+// so it is implemented as a private static method (Logger::RotateIfNeededInternal below)
 
 } // namespace
 
 //============================================================================
-// Logger 公共 API
+// Logger public API
 //============================================================================
 bool Logger::Init(const std::string& logDir) {
     std::lock_guard<std::mutex> lock(s_mutex);
 
     s_logDir = logDir;
 
-    // 1) 确保日志目录存在
+    // 1) Ensure log directory exists
     if (!EnsureDirectory(logDir)) {
         std::cerr << "[Logger] Failed to create log directory: " << logDir << std::endl;
         return false;
     }
 
-    // 2) 打开当天的日志文件
+    // 2) Open today's log file
     s_currentFile = MakeLogFileName();
     std::string fullPath = s_logDir + "\\" + s_currentFile;
 
@@ -145,7 +146,7 @@ bool Logger::Init(const std::string& logDir) {
     return true;
 }
 
-// 内部：跨日时重新打开文件（Logger 类内私有友元）
+// Internal: reopen file on day rollover (private static method of Logger)
 void Logger::RotateIfNeededInternal() {
     std::string expected = MakeLogFileName();
     if (expected != s_currentFile) {
@@ -186,24 +187,24 @@ void Logger::Write(LogLevel level, const std::string& message) {
     std::lock_guard<std::mutex> lock(s_mutex);
 
     if (!s_initialized) {
-        // 没有 Init 过，只输出到 stderr，不写文件
+        // Not initialized; output to stderr only, no file write
         std::cerr << "[" << LevelToString(level) << "] " << message << std::endl;
         return;
     }
 
-    // 跨日检测：跨天时切换到新文件
+    // Cross-day detection: switch to a new file when day changes
     RotateIfNeededInternal();
 
     std::string line = "[" + CurrentTimestamp() + "] ["
                      + LevelToString(level) + "] " + message;
 
-    // 写文件
+    // Write to file
     if (s_ofs.is_open()) {
         s_ofs << line << std::endl;
         s_ofs.flush();
     }
 
-    // 同时输出到控制台（开发期方便观察）
+    // Also output to console (convenient during development)
     if (level == LogLevel::Error) {
         std::cerr << line << std::endl;
     } else {

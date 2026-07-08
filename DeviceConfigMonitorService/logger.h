@@ -15,7 +15,7 @@
 #include <mutex>
 
 //============================================================================
-// LogLevel - 日志等级
+// LogLevel - severity levels
 //============================================================================
 enum class LogLevel {
     Info,
@@ -24,38 +24,38 @@ enum class LogLevel {
 };
 
 //============================================================================
-// Logger - 单例风格的日志写入器
+// Logger - singleton-style log writer
 //============================================================================
-// 设计：
-//   - 通过 Init(logPath) 指定日志目录；日志文件名固定为 service-<日期>.log
-//     例如 service-2026-07-08.log，每天一个文件，避免单文件过大
-//   - Info/Warn/Error 三个公开方法，参数与 std::cout 一致（流式 API）
-//   - 文件写入 + 控制台输出双重输出（开发期方便观察）
-//   - 线程安全：所有写入操作由 mutex 串行化
+// Design:
+//   - Init(logPath) specifies the log directory; log file name is fixed as service-<date>.log
+//     e.g. service-2026-07-08.log, one file per day to prevent unbounded growth
+//   - Info/Warn/Error are three public methods consistent with std::cout (stream-like API)
+//   - Dual output: file write + console output (convenient during development)
+//   - Thread-safe: all write operations serialized by a mutex
 //============================================================================
 class Logger {
 public:
-    // 初始化日志目录（路径来自 AppConfig.LogPath）
-    // 返回 true = 成功；返回 false = 目录创建失败（写入会静默跳过）
+    // Initialize log directory (path from AppConfig.LogPath)
+    // Returns true on success; false on directory creation failure (writes are silently skipped)
     static bool Init(const std::string& logDir);
 
-    // 显式关闭（程序退出时调用，确保缓冲区 flush）
+    // Explicit shutdown (call on program exit to ensure buffer flush)
     static void Shutdown();
 
-    // 三个等级的日志写入
+    // Three severity levels for log writing
     static void Info(const std::string& message);
     static void Warn(const std::string& message);
     static void Error(const std::string& message);
 
-    // 内部实现：等级字符串 + 消息写入
+    // Internal: level string + message write
     static void Write(LogLevel level, const std::string& message);
 
-    // 查询状态（自检用）
+    // Status queries (for self-check use)
     static bool IsInitialized();
     static const std::string& GetCurrentLogFile();
 
 private:
-    // 跨日检测：跨天时切换到新文件
+    // Cross-day detection: switch to a new file when day changes
     static void RotateIfNeededInternal();
 
     static std::string  s_logDir;

@@ -18,7 +18,7 @@
 #endif
 
 //============================================================================
-// 全局状态（Windows Service 必须用全局变量保存 ServiceStatusHandle）
+// Global state (Windows Service must use global variables for ServiceStatusHandle)
 //============================================================================
 namespace {
 
@@ -29,14 +29,14 @@ std::atomic<bool>     g_serviceStopRequested{false};
 } // namespace
 
 //============================================================================
-// RunServiceBody - 控制台模式和服务模式共用的业务主体
+// RunServiceBody - Shared business logic for console and service modes
 //============================================================================
-// 流程（与原 main.cpp 的 --console 流程一致）：
+// Flow (same as --console in main.cpp):
 //   1) LoadConfig
 //   2) Logger::Init
 //   3) HeartbeatWorker.Start
-//   4) 主循环：每 200ms 检查 stopFlag
-//   5) 优雅停止：worker.Stop() + Logger::Shutdown()
+//   4) Main loop: check stopFlag every 200ms
+//   5) Graceful shutdown: worker.Stop() + Logger::Shutdown()
 //============================================================================
 void RunServiceBody(std::atomic<bool>& stopFlag) {
     Logger::Info("Service starting up...");
@@ -65,86 +65,87 @@ void RunServiceBody(std::atomic<bool>& stopFlag) {
 }
 
 //============================================================================
-// ServiceMain - Windows SCM 调用的入口
+// ServiceMain - Entry point called by Windows SCM
 //============================================================================
-// 注意：ServiceMain 函数的签名必须完全匹配
+// Note: The signature of ServiceMain must exactly match
 //   void WINAPI ServiceMain(DWORD argc, LPWSTR* argv)
-// 它由 SCM 异步调用，函数返回 ≠ 服务停止；
-// 我们在内部用 ReportStatus + 业务循环保持服务存活。
+// It is called asynchronously by SCM; returning from this function does
+// NOT mean the service has stopped. We keep the service alive by calling
+// ReportStatus + running the business loop inside a worker thread.
 //============================================================================
 void WINAPI ServiceMain(DWORD /*argc*/, LPWSTR* /*argv*/) {
-    // 1) 注册控制处理器
+    // 1) Register the control handler
     g_serviceStatusHandle = RegisterServiceCtrlHandlerW(
         L"DeviceConfigMonitorService",
         ServiceCtrlHandler);
 
     if (g_serviceStatusHandle == nullptr) {
-        // 注册失败：无法继续（没有 handle 就无法上报状态）
+        // Registration failed: cannot continue (no handle means cannot report status)
         return;
     }
 
-    // 2) 初始化 SERVICE_STATUS
+    // 2) Initialize SERVICE_STATUS
     g_serviceStatus.dwServiceType             = SERVICE_WIN32_OWN_PROCESS;
     g_serviceStatus.dwServiceSpecificExitCode = 0;
     g_serviceStatus.dwWin32ExitCode           = 0;
-    g_serviceStatus.dwWaitHint                = 1000; // 1 秒
+    g_serviceStatus.dwWaitHint                = 1000; // 1 second
 
-    // 3) 上报 SERVICE_START_PENDING
+    // 3) Report SERVICE_START_PENDING
     g_serviceStatus.dwCurrentState = SERVICE_START_PENDING;
-    g_serviceStatus.dwControlsAccepted = 0;  // START_PENDING 阶段不接受控制
+    g_serviceStatus.dwControlsAccepted = 0;  // No control accepted during START_PENDING
     SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
 
-    // 4) 启动业务线程
-    // 注意：ServiceMain 本身是 SCM 调用的回调，不能阻塞；
-    //       必须把业务逻辑放到子线程里跑，ServiceMain 自己尽快返回。
+    // 4) Start the business thread
+    // Note: ServiceMain itself is a callback invoked by SCM and must not block;
+    //       business logic must run in a child thread; ServiceMain returns promptly.
     std::thread serviceThread([&]() {
-        // 子线程里上报 RUNNING
+        // Report RUNNING from the child thread
         g_serviceStatus.dwCurrentState    = SERVICE_RUNNING;
         g_serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP
                                            | SERVICE_ACCEPT_SHUTDOWN;
         SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
 
-        // 业务主体（阻塞，直到 stopFlag 被 CtrlHandler 置位）
+        // Business body (blocks until stopFlag is set by CtrlHandler)
         RunServiceBody(g_serviceStopRequested);
 
-        // 业务循环退出后上报 SERVICE_STOPPED
+        // Report SERVICE_STOPPED after the business loop exits
         g_serviceStatus.dwCurrentState    = SERVICE_STOPPED;
         g_serviceStatus.dwControlsAccepted = 0;
         SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
     });
 
-    // 5) ServiceMain 立即返回
-    //    业务逻辑在 serviceThread 里跑
+    // 5) ServiceMain returns promptly
+    //    Business logic runs in serviceThread
     if (serviceThread.joinable()) {
         serviceThread.join();
     }
 }
 
 //============================================================================
-// ServiceCtrlHandler - 接收控制码
+// ServiceCtrlHandler - Receives control codes
 //============================================================================
-// 目前只处理 STOP 和 SHUTDOWN；其他控制码直接返回。
+// Currently handles STOP and SHUTDOWN only; other codes return immediately.
 //============================================================================
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode) {
     switch (ctrlCode) {
         case SERVICE_CONTROL_STOP:
-            // 1) 先上报 STOP_PENDING
+            // 1) Report STOP_PENDING first
             g_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
             SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
 
-            // 2) 置位停止标志，业务循环会退出
+            // 2) Set the stop flag so the business loop exits
             g_serviceStopRequested.store(true);
             break;
 
         case SERVICE_CONTROL_SHUTDOWN:
-            // 系统关停时同样要优雅退出
+            // System shutdown: also exit gracefully
             g_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
             SetServiceStatus(g_serviceStatusHandle, &g_serviceStatus);
             g_serviceStopRequested.store(true);
             break;
 
         default:
-            // 其他控制码直接返回
+            // Other control codes: return immediately
             break;
     }
 }
