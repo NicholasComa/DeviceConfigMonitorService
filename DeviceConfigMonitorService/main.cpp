@@ -7,22 +7,25 @@
 #include <cstring>
 #include <atomic>
 #include <csignal>
-#include <thread>
-#include <chrono>
 
 #include "config.h"
 #include "logger.h"
 #include "heartbeat_worker.h"
+#include "service_main.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 const std::string PROGRAM_NAME = "DeviceConfigMonitorService";
 const std::string VERSION = "1.0.0";
 
-// 全局停止标志（信号处理函数置位）
-static std::atomic<bool> g_stopRequested{false};
+// 控制台模式专用停止标志
+static std::atomic<bool> g_consoleStopRequested{false};
 
 // Ctrl+C 信号处理：让 while 循环体优雅退出
-static void SignalHandler(int /*signum*/) {
-    g_stopRequested.store(true);
+static void ConsoleSignalHandler(int /*signum*/) {
+    g_consoleStopRequested.store(true);
 }
 
 void printBanner() {
@@ -36,6 +39,7 @@ void printUsage(const char* programName) {
     std::cout << "Usage: " << programName << " [--console]" << std::endl;
     std::cout << "  --console    Run in console mode (with config + heartbeat)" << std::endl;
     std::cout << "  --help       Show this help message" << std::endl;
+    std::cout << "  (no flag)    Run as Windows Service (registered via scripts/*.bat)" << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -54,50 +58,40 @@ int main(int argc, char* argv[]) {
     if (consoleMode) {
         printBanner();
 
-        // 1) 读取配置
-        Logger::Info("Service starting up...");
-        AppConfig config = LoadConfig();
-        Logger::Info("Configuration loaded. DeviceId=" + config.DeviceId
-                     + ", ServiceName=" + config.ServiceName
-                     + ", LogPath=" + config.LogPath);
-        PrintConfigSummary(config);
+        // 注册 Ctrl+C 处理
+        std::signal(SIGINT, ConsoleSignalHandler);
+        std::signal(SIGTERM, ConsoleSignalHandler);
 
-        // 2) 初始化日志（路径来自 config.LogPath）
-        if (!Logger::Init(config.LogPath)) {
-            std::cerr << "[WARN] Logger init failed, console output only." << std::endl;
-        }
-        Logger::Info("Logger initialized. LogDir=" + config.LogPath);
+        // 打印配置摘要（控制台模式特色）
+        AppConfig previewConfig = LoadConfig();
+        PrintConfigSummary(previewConfig);
+        // 注意：LoadConfig 之后 config.json 已经被读取，
+        //       RunServiceBody 里会再读一次。性能上没问题（IO 很轻）。
 
-        // 3) 注册 Ctrl+C 处理
-        std::signal(SIGINT, SignalHandler);
-        std::signal(SIGTERM, SignalHandler);
-
-        // 4) 启动心跳 worker
-        HeartbeatWorker worker;
-        worker.Start(config);
-
-        // 5) 主循环：等待 Ctrl+C
-        std::cout << std::endl;
         std::cout << "Service is running. Press Ctrl+C to stop." << std::endl;
-        Logger::Info("Service entered main loop. Press Ctrl+C to stop.");
+        std::cout << std::endl;
 
-        while (!g_stopRequested.load()) {
-            // 短间隔 sleep，让循环有退出窗口
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
-
-        // 6) 优雅停止
-        Logger::Info("Stop signal received. Shutting down...");
-        worker.Stop();
-        Logger::Info("Service stopped.");
-        Logger::Shutdown();
+        // 共用业务主体
+        RunServiceBody(g_consoleStopRequested);
 
         std::cout << "Service stopped gracefully." << std::endl;
     }
     else {
-        std::cout << "Starting " << PROGRAM_NAME << " as Windows Service..." << std::endl;
-        std::cout << "Use --console flag to run in console mode." << std::endl;
-        // Windows Service 模式将在 Day 4 实现
+        // Windows Service 模式
+        // SERVICE_TABLE_ENTRY 把服务名映射到 ServiceMain 入口
+        // StartServiceCtrlDispatcher 会一直阻塞直到服务停止
+        SERVICE_TABLE_ENTRY serviceTable[] = {
+            { (LPWSTR)L"DeviceConfigMonitorService", (LPSERVICE_MAIN_FUNCTION)ServiceMain },
+            { nullptr, nullptr }
+        };
+
+        if (!StartServiceCtrlDispatcher(serviceTable)) {
+            // 启动失败：可能是 SCM 不可用（比如直接双击 exe 而不是用 services.msc）
+            // 这里写 stderr 而不是调 Logger，因为 Logger 还未初始化
+            std::cerr << "StartServiceCtrlDispatcher failed. "
+                      << "If you want to run in console mode, use --console flag." << std::endl;
+            return 1;
+        }
     }
 
     return 0;

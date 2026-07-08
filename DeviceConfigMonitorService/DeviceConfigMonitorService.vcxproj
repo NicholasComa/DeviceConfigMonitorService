@@ -134,11 +134,13 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="heartbeat_worker.h" />
+    <ClInclude Include="service_main.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="heartbeat_worker.cpp" />
+    <ClCompile Include="service_main.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
