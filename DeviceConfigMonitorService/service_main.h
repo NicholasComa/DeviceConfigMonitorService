@@ -10,6 +10,12 @@
 
 #pragma once
 
+#include <atomic>
+
+#ifdef _WIN32
+#include <windows.h>   // WINAPI, DWORD, LPWSTR, SERVICE_STATUS, ...
+#endif
+
 //============================================================================
 // 公共 API
 //============================================================================
@@ -20,9 +26,11 @@
 // 内部循环每 200ms 检查一次 stopFlag，最长退出延迟 200ms
 void RunServiceBody(std::atomic<bool>& stopFlag);
 
+#ifdef _WIN32
 // Windows Service 入口（被 SCM 调用，**不直接由 main 调用**）
 // 注册 ServiceCtrlHandler + 启动主循环
 void WINAPI ServiceMain(DWORD argc, LPWSTR* argv);
 
 // 控制回调：响应 SERVICE_CONTROL_STOP / SERVICE_CONTROL_SHUTDOWN
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode);
+#endif
