@@ -18,6 +18,15 @@
 ### 控制台模式
 ```bash
 D:/workspace/training/DeviceConfigMonitorService/x64/Debug/DeviceConfigMonitorService.exe --console
+```
+
+### 控制台模式行为说明
+- 启动后自动从 `C:\ProgramData\NanningTraining\DeviceConfigMonitorService\config.json` 加载配置（不存在则自动生成默认配置）
+- 配置中 `LogPath` 指定的目录会自动创建
+- 心跳日志按 `HeartbeatIntervalSeconds` 周期写入该目录下的 `service-YYYY-MM-DD.log`
+- 如果 `EnableHeartbeat=false`，则不输出周期心跳
+- 如果 `HeartbeatIntervalSeconds<=0`，则使用默认值 5 秒
+- 按 `Ctrl+C` 优雅退出（先停止心跳线程，再 flush 日志）
 
 ##############################################################################################################
 
