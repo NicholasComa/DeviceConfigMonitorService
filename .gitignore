@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/DeviceConfigMonitorService/resource.h
+/DeviceConfigMonitorService/DeviceConfigMonitorService.rc
+/DeviceConfigMonitorService/DeviceConfigMonitorService.vcxproj
+/DeviceConfigMonitorService/DeviceConfigMonitorService.vcxproj.filters
