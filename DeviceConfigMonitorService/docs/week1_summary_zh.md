@@ -37,7 +37,7 @@
 
 ## 2. Git 提交记录
 
-分支 `week5-cpp-service` 截至本报告前包含 30 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
+分支 `day5-cpp-service` 截至本报告前包含 30 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
 
 ### 2.1 第 1 天 - 工程初始化
 
@@ -90,7 +90,7 @@
 |---|---|---|
 | `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 误操作合并分支 |
 | `f92443a` | docs: app: Update README with full project documentation and FAQ | 更新README为最终版 |
-| `f92443a` | `docs: app: Add service test report` | 新增：`docs/test_report.md` |
+| `72a25cb` | `docs: app: Add service test report` | 新增：`docs/test_report.md` |
 | `794aad9` | `docs: app: Add week 1 summary` | 新增：`docs/week1_summary.md` |
 | `f7eba97` | docs: app: Add Chinese version of report and summary report | 新增中文版报告文件 |
 | `6ea3d3a` | docs: app: Update the text content | 更新文件 |
@@ -105,7 +105,7 @@
 
 ## 3. 工程结构
 
-仓库采用扁平布局（源码在工程根目录，`scripts/`、`docs/`、`third_party/` 为子目录）。
+仓库采用扁平布局（`src/` 存放 C++ 源文件，`scripts/`、`docs/`、`third_party/` 为子目录）。
 
 ```
 DeviceConfigMonitorService/
@@ -115,11 +115,16 @@ DeviceConfigMonitorService/
 +- .gitattributes
 +- x64/                          # 构建输出（已 gitignore）
 +- DeviceConfigMonitorService/
-   +- main.cpp                   # 入口：--console 或 SCM 分发
-   +- config.h / config.cpp      # AppConfig + JSON 加载/保存
-   +- logger.h / logger.cpp      # Logger
-   +- heartbeat_worker.h / .cpp  # HeartbeatWorker
-   +- service_main.h / .cpp      # ServiceMain + ServiceCtrlHandler
+   +- src/                       # 源码（C++ 实现文件）
+   |  +- main.cpp                # 入口：--console 或 SCM 分发
+   |  +- config.cpp              # AppConfig + JSON 加载/保存
+   |  +- logger.cpp              # Logger
+   |  +- heartbeat_worker.cpp    # HeartbeatWorker
+   |  +- service_main.cpp        # ServiceMain + ServiceCtrlHandler
+   +- config.h                   # AppConfig 头文件（与 src/config.cpp 配对）
+   +- logger.h                   # 与 src/logger.cpp 配对
+   +- heartbeat_worker.h         # 与 src/heartbeat_worker.cpp 配对
+   +- service_main.h             # 与 src/service_main.cpp 配对
    +- config.example.json        # 配置样例
    +- DeviceConfigMonitorService.vcxproj
    +- DeviceConfigMonitorService.vcxproj.filters
@@ -130,9 +135,7 @@ DeviceConfigMonitorService/
    |  +- stop.bat
    |  +- query.bat
    +- docs/                      # 文档
-   |  +- test_report.md
    |  +- test_report_zh.md
-   |  +- week1_summary.md
    |  +- week1_summary_zh.md
    +- third_party/               # 第三方依赖库
       +- nlohmann/
@@ -143,11 +146,11 @@ DeviceConfigMonitorService/
 
 | 模块 | 文件 | 用途 |
 |---|---|---|
-| 配置 | `config.{h,cpp}` | `AppConfig` 结构体、`LoadConfig`、`SaveConfig`、`PrintConfigSummary` |
-| 日志 | `logger.{h,cpp}` | 按日轮转的日志写入器，`Info` / `Warn` / `Error` |
-| 心跳 | `heartbeat_worker.{h,cpp}` | 写入周期性心跳记录的后台 `std::thread` |
-| 服务框架 | `service_main.{h,cpp}` | `ServiceMain`、`ServiceCtrlHandler`、状态上报 |
-| 主程序 | `main.cpp` | 参数解析、模式分发 |
+| 配置 | `config.h`（根）/`src/config.cpp` | `AppConfig` 结构体、`LoadConfig`、`SaveConfig`、`PrintConfigSummary` |
+| 日志 | `logger.h`（根）/`src/logger.cpp` | 按日轮转的日志写入器，`Info` / `Warn` / `Error` |
+| 心跳 | `heartbeat_worker.h`（根）/`src/heartbeat_worker.cpp` | 写入周期性心跳记录的后台 `std::thread` |
+| 服务框架 | `service_main.h`（根）/`src/service_main.cpp` | `ServiceMain`、`ServiceCtrlHandler`、状态上报 |
+| 主程序 | `src/main.cpp` | 参数解析、模式分发 |
 | 脚本 | `scripts/*.bat` | 服务生命周期脚本（需管理员权限） |
 | 文档 | `docs/*.md` | 测试报告与周报 |
 | 第三方库 | `third_party/nlohmann/json.hpp` | JSON 解析（单头文件） |
@@ -321,7 +324,7 @@ scripts\uninstall.bat
 
 ### 7.1 未解决的问题
 
-**问题1：** 在后面提交改动时，不知道为什么自动进行了一次合并。然而vistual studio和git bash都中并未找到提交记录。
+**问题1：** 在后面提交改动时，不知道为什么自动进行了一次合并。然而Visual Studio和git bash都中并未找到提交记录。
 
 | `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 误操作合并分支 |
 
@@ -333,15 +336,15 @@ scripts\uninstall.bat
 
 **现象1：** 使用 git bash 时，未建立vs工程文件，没有明确的项目意识。
 
-第一次接触 git 还没有完全理解 git 的操作方法，直接跟着“Git安装与使用新手教程”跑，完全没有联想到vistual studio，在执行 `git clone<repo-url>`时才发现陷入了思维惯性。
+第一次接触 git 还没有完全理解 git 的操作方法，直接跟着“Git安装与使用新手教程”跑，完全没有联想到Visual Studio，在执行 `git clone<repo-url>`时才发现陷入了思维惯性。
 
-**解决：** 找到第一周项目计划书仔细阅读后，理解到 git bash 提供的作用。后需根据项目计划书和ai的帮助，一步步开始在vistual studio上创建项目工程。
+**解决：** 找到第一周项目计划书仔细阅读后，理解到 git bash 提供的作用。后需根据项目计划书和ai的帮助，一步步开始在Visual Studio上创建项目工程。
 
 **现象2：** 远程仓库拉取问题。
 
 由于初次使用 git ，没有理解清楚仓库相关概念，后续在github上随机克隆到的本地仓库发现没有上传分支的权限，导致 commit 失败。
 
-**解决：** 在b站上学习了仓库和 git 的相关教程后，理解了git 、github 、vistual studio、vs code 的关联协作工作能力，学会了相关工具的使用方法。
+**解决：** 在b站上学习了仓库和 git 的相关教程后，理解了git 、github 、Visual Studio、vs code 的关联协作工作能力，学会了相关工具的使用方法。
 
 **现象3：** 远程仓库推送问题。
 
@@ -420,11 +423,11 @@ current source character set (codepage 936).
 - 基础语法、命令行模式、github 使用方式
 - 使用ai工具帮助项目计划实现
 - 能够使用 git 进行基本的拉取、提交、推送功能
-- 熟悉了 Vistual Studio 在工作流程中的使用方法
+- 熟悉了 Visual Studio 在工作流程中的使用方法
 
 ### 9.2 最需要练习的部分
 
-- **基本工作流程：** 多加练习 git 、 Vistual Studio 等相关工具的工作交互流程，深入掌握调试工具，理解项目配置文件结构。
+- **基本工作流程：** 多加练习 git 、 Visual Studio 等相关工具的工作交互流程，深入掌握调试工具，理解项目配置文件结构。
 - **Windows 服务理解：** 深化对Windows 服务控制管理器的状态机机制的理解。
 - **基本项目意识：** 学会理解项目相关工具的基本使用方式和场景，学会看懂编写程序时的报错信息，学会记录任务中的关键节点以便于后续排查错误。
 

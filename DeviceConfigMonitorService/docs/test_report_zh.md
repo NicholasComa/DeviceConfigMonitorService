@@ -8,7 +8,7 @@
 | 编译器 | MSVC v143（Visual Studio 2022 Community 17.x） |
 | Windows SDK | 10.0.26100.0 |
 | 构建配置 | Debug \| x64 |
-| 项目分支 | `week5-cpp-service` |
+| 项目分支 | `day5-cpp-service` |
 | 仓库地址 | https://github.com/NicholasComa/DeviceConfigMonitorService |
 | 测试日期 | 2026-07-08 |
 | 测试人 | 肖顺志 |
@@ -34,10 +34,9 @@
 | `*.user` 已被 gitignore 忽略 | 通过 | `DeviceConfigMonitorService.vcxproj.user` 被忽略 |
 | `git status` 工作树干净 | 通过 | 显示 “nothing to commit, working tree clean” |
 | 仓库根目录存在 `.gitignore` | 通过 | `.gitignore` 已被纳入版本控制 |
-| 分支与远程一致 | 通过 | `git fetch origin` 对 `week5-cpp-service` 未显示任何新变更 |
+| 分支与远程一致 | 通过 | `git fetch origin` 对 `day5-cpp-service` 未显示任何新变更 |
 
-说明：`origin/week5-cpp-service` 在第 5 天推送之前并不存在（远程上仅到 `week4-cpp-service`）。
-该新分支在本地创建，并作为第 5 天最终交付物的一部分被推送。
+说明：`origin/day5-cpp-service` 该新分支在本地创建，并作为第 5 天最终交付物的一部分被推送。
 
 ### 3.2 构建验证
 
@@ -192,7 +191,7 @@ T4（DeviceId=T4）的心跳计数：0
 2. 在该位置运行 `install.bat`。
 3. 在该位置运行 `uninstall.bat`。
 
-**预期：** 即使路径含空格，脚本也能正确展开 `%~dp0`。当预期的相对位置不存在二进制文件时，应优雅失败。
+**预期：** 即使路径含空格，脚本也能正确展开 `%~dp0`。当预期的相对位置不存在二进制文件时，应提示失败。
 
 **实际：**
 
@@ -232,7 +231,7 @@ C:\Temp With Space>uninstall.bat
 | 写入启动日志 | 通过 | `service-2026-07-08.log` 中出现“Service starting up...”和“Heartbeat worker starting”记录 |
 | 写入停止日志 | 通过 | 出现“Stop signal received. Shutting down...”和“Service stopped.”记录 |
 | 停止后不再写日志 | 通过 | 停止后心跳计数冻结；在“Service stopped.”行之后不再出现新记录 |
-| ![日志 运行截图](./screenshots/service_log(1).png) |
+|   |   | ![日志 运行截图](./screenshots/service_log_1.png) |
 
 **结果：通过（8 项子检查全部通过）**
 
