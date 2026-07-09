@@ -37,7 +37,7 @@
 
 ## 2. Git 提交记录
 
-分支 `week5-cpp-service` 截至本报告时包含 28 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
+分支 `week5-cpp-service` 截至本报告前包含 30 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
 
 ### 2.1 第 1 天 - 工程初始化
 
@@ -88,12 +88,13 @@
 
 | 提交 | 提交信息 | 用途 |
 |---|---|---|
-
 | `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 误操作合并分支 |
 | `f92443a` | docs: app: Update README with full project documentation and FAQ | 更新README为最终版 |
 | `f92443a` | `docs: app: Add service test report` | 新增：`docs/test_report.md` |
 | `794aad9` | `docs: app: Add week 1 summary` | 新增：`docs/week1_summary.md` |
 | `f7eba97` | docs: app: Add Chinese version of report and summary report | 新增中文版报告文件 |
+| `6ea3d3a` | docs: app: Update the text content | 更新文件 |
+| `4faa79b` | docs: app: Update the text content | 更新测试报告和汇报文件 |
 
 ### 2.6 提交规范
 
