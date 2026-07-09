@@ -238,7 +238,7 @@ C:\Temp With Space>uninstall.bat
 
 ## 4. 遇到的问题
 
-本周遇到并解决了以下问题。此处作为测试报告的一部分列出；完整的复盘见 `docs/week1_summary_zh.md` 第 8 节,[点击查看测试详情](./week1_summary_zh.md#8-问题复盘)。
+本周遇到并解决了以下问题。此处作为测试报告的一部分列出；完整的复盘见 `docs/week1_summary_zh.md` 第 8 节,[点击查看详情](./week1_summary_zh.md#8-问题复盘)。
 
 | # | 问题 | 状态 |
 |---|---|---|
