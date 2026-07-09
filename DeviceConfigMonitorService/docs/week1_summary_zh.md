@@ -1,7 +1,7 @@
 # 第一周书面汇报 - DeviceConfigMonitorService
 
-**作者：** 第一周实习生
-**分支：** `week5-cpp-service`（南宁培训计划第一周）
+**作者：** 肖顺志
+**分支：** `day5-cpp-service`（第一周）
 **日期：** 2026-07-08
 **培训计划：** 南宁软件组，第一周培训计划
 
@@ -9,10 +9,10 @@
 
 ## 1. 项目概述
 
-`DeviceConfigMonitorService` 是一个 C++17 的 Windows 后台服务，用于监控设备配置，并周期性地将心跳日志写入本地日志文件。它是南宁软件组培训计划第一周的实战交付物。
+`DeviceConfigMonitorService` 是一个 C++17 的 Windows 后台服务，用于监控设备配置，并周期性地将心跳日志写入本地日志文件。它是培训计划第一周的实战项目。
 
 ### 1.1 目的
-
+- 学会使用 Git 完成拉取代码、创建分支、提交代码、推送分支、查看提交记录和处理简单冲突。
 - 提供一个最小但贴近生产形态、用于参考的 C++ Windows 服务示例，包含：配置管理、结构化日志、后台心跳，以及 Windows 服务控制管理器（SCM）集成。
 - 在 Windows 上完整演练开发闭环：Git 分支、Visual Studio C++ 工程、MSVC 编译器、批处理脚本，以及作为真实 Windows 服务的部署。
 
@@ -22,8 +22,8 @@
 
 | 模式 | 调用方式 | 使用场景 |
 |---|---|---|
-| 控制台模式 | `DeviceConfigMonitorService.exe --console` | 开发、调试 |
-| Windows 服务模式 | `scripts\install.bat` + `scripts\start.bat` | 生产部署 |
+| 控制台模式 | `x64\Debug\DeviceConfigMonitorService.exe --console` | 开发、调试 |
+| Windows 服务模式 | 在管理员模式实现 `install.bat` 、`start.bat`、`query.bat`、`stop.bat`、`uninstall.bat` | 生产部署 |
 
 ### 1.3 第一周范围
 
@@ -33,11 +33,11 @@
 | 第 2 天 | AppConfig + JSON 配置加载/保存 + 错误处理 | 已完成 |
 | 第 3 天 | Logger 模块 + Heartbeat 工作线程 + 控制台模式 | 已完成 |
 | 第 4 天 | Windows 服务框架 + 控制脚本 | 已完成 |
-| 第 5 天 | 仓库清理、完整测试通过、文档整理 | 已完成（本报告） |
+| 第 5 天 | 仓库清理、完整测试通过、文档整理 | 已完成 |
 
 ## 2. Git 提交记录
 
-分支 `week5-cpp-service` 截至本报告时包含 24 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
+分支 `week5-cpp-service` 截至本报告时包含 28 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
 
 ### 2.1 第 1 天 - 工程初始化
 
@@ -56,6 +56,7 @@
 | `3b604ff` | fix: app: Skip bare drive letter in EnsureConfigDirectory | 修复 `C:` pop_back 缺陷 |
 | `373c884` | fix: app: Move bare-drive check after pop_back in EnsureConfigDirectory | 完善同一修复 |
 | `28ad113` | fix: build: Add /utf-8 compiler flag for MSVC encoding | 修复 GBK 代码页 936 问题 |
+| `35efa45` | docs: app: Add English version of the training project README | README 本地化为英文 |
 
 ### 2.3 第 3 天 - 日志与心跳
 
@@ -64,7 +65,7 @@
 | `7ee0207` | func: app: Add service log writer | Logger 模块（Info/Warn/Error） |
 | `b4b6d89` | fix: app: Fix logger compile errors | 修复 `<chrono>` 与私有成员访问 |
 | `00d80d8` | func: app: Add heartbeat worker | 带原子停止标志的 HeartbeatWorker |
-| `35efa45` | docs: app: Add English version of the training project README | README 本地化为英文 |
+| `884a3cf` | docs: app:  Supplement the training project README | 更新README |
 
 ### 2.4 第 4 天 - Windows 服务框架
 
@@ -80,20 +81,23 @@
 | `484edb0` | fix: conf: Remove Chinese comments from .bat scripts to fix encoding | GBK cmd.exe 编码问题 |
 | `e770fe8` | fix: conf: Fix binary path in install.bat (one more parent level) | 路径深度修复 |
 | `5e3fea6` | fix: conf: Use absolute path to sc.exe in all scripts | `sc` 不在 PATH 问题修复 |
+| `d157512` | style: app: Modify Chinese comments to English | 代码风格与 README 对齐 |
+| `12e73f9` | docs: app: Update the contents of the README | 更新 README |
 
 ### 2.5 第 5 天 - 清理、文档与汇报
 
 | 提交 | 提交信息 | 用途 |
 |---|---|---|
-| `d157512` | style: app: Modify Chinese comments to English | 代码风格与 README 对齐 |
-| `12e73f9` | docs: app: Update the contents of the README | 最终 README 重写 |
-| `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 与另一贡献者同步 |
-| （第 5 天最终） | `docs: app: Add service test report` | 新增：`docs/test_report.md` |
-| （第 5 天最终） | `docs: app: Add week 1 summary` | 新增：`docs/week1_summary.md`（本文件） |
+
+| `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 误操作合并分支 |
+| `f92443a` | docs: app: Update README with full project documentation and FAQ | 更新README为最终版 |
+| `f92443a` | `docs: app: Add service test report` | 新增：`docs/test_report.md` |
+| `794aad9` | `docs: app: Add week 1 summary` | 新增：`docs/week1_summary.md` |
+| `f7eba97` | docs: app: Add Chinese version of report and summary report | 新增中文版报告文件 |
 
 ### 2.6 提交规范
 
-- 所有提交信息遵循 `TYPE: app: SUBJECT` 模板。
+- 所有提交信息遵循 `TYPE: app: NOTICE：SUBJECT` 模板。
 - 使用过的 `TYPE` 值：`func`、`fix`、`docs`、`build`、`style`、`conf`、`merge`。
 - 主题使用英文，简短，且描述单一改动。
 - 没有出现 “update” / “fix bug” / “test” / “WIP” 这类信息。
@@ -223,11 +227,11 @@ Logger 使用 `std::mutex` 串行化所有文件和控制台写入。多个线�
 - 首次心跳立即发出，之后工作线程等待下一个间隔。
 - 等待被切分为 200 毫秒的小片，以保持较低的停止延迟（`Stop` 到工作线程退出之间最多 200 毫秒）。
 - 若 `EnableHeartbeat=false`，仅记录一行信息：`Heartbeat is disabled (EnableHeartbeat=false).`
-- 若 `HeartbeatIntervalSeconds <= 0`，实际间隔为 5 秒。
+- 若 `HeartbeatIntervalSeconds <= 0`，则自动设置间隔为 5 秒。
 
 ### 5.5 停止日志
 
-在优雅关闭时（控制台模式的 Ctrl+C，或服务模式下的 `SERVICE_CONTROL_STOP` / `SHUTDOWN`）：
+在服务关闭时（控制台模式的 Ctrl+C，或服务模式下的 `SERVICE_CONTROL_STOP` / `SHUTDOWN`）：
 
 ```
 [INFO] Stop signal received. Shutting down...
@@ -281,7 +285,7 @@ scripts\start.bat
 :: 查询（sc query）-> STATE、PID、dwControlsAccepted
 scripts\query.bat
 
-:: 停止（优雅，发送 SERVICE_CONTROL_STOP）
+:: 停止（发送 SERVICE_CONTROL_STOP）
 scripts\stop.bat
 
 :: 卸载（若正在运行则先停止，再删除服务）
@@ -292,7 +296,7 @@ scripts\uninstall.bat
 
 ### 6.4 为什么 RunServiceBody 是共用的
 
-业务主体（`LoadConfig -> Logger::Init -> HeartbeatWorker.Start -> 主循环 -> 优雅关闭`）在控制台模式和服务模式下完全相同。唯一的区别是停止标志的来源：
+业务主体（`LoadConfig -> Logger::Init -> HeartbeatWorker.Start -> 主循环 -> 最后关闭`）在控制台模式和服务模式下完全相同。唯一的区别是停止标志的来源：
 
 | 模式 | 停止标志来源 |
 |---|---|
@@ -303,7 +307,7 @@ scripts\uninstall.bat
 
 ## 7. 测试结果
 
-完整细节与逐步输出见 `docs/test_report.md`。摘要如下：
+完整细节与逐步输出见 `docs/test_report_zh.md`，[点击查看测试详情](./test_report_zh.md#31-仓库卫生)。摘要如下：
 
 | 类别 | 总数 | 通过 | 失败 |
 |---|---|---|---|
@@ -311,18 +315,40 @@ scripts\uninstall.bat
 | 构建验证 | 4 | 4 | 0 |
 | 控制台模式（B-1 至 B-5） | 5 | 5 | 0 |
 | 脚本路径处理（E-1） | 1 | 1 | 0 |
-| Windows 服务（第 4 天证据） | 8 | 8 | 0 |
+| Windows 服务（第 4 天结果） | 8 | 8 | 0 |
 | **合计** | **24** | **24** | **0** |
 
 ### 7.1 未解决的问题
 
-截至撰写本文时，无未解决问题。
+**问题1：** 在后面提交改动时，不知道为什么自动进行了一次合并。然而vistual studio和git bash都中并未找到提交记录。
+
+| `d2c6d48` | Merge branch 'week1-cpp-service' of origin | 误操作合并分支 |
 
 ## 8. 问题复盘
 
-本周遇到并解决了三个主要问题。每个问题都在此记录原始现象、定位过程和最终修复。
+本周遇到并解决了一些使用 git 和创建服务程序时的问题。每个问题都在此记录原始现象、定位过程和最终修复。
 
-### 8.1 MSVC 代码页 936 / UTF-8 问题（第 2 天）
+### 8.1 初次使用 git 时的问题（第 1 天）
+
+**现象1：** 使用 git bash 时，未建立vs工程文件，没有明确的项目意识。
+
+第一次接触 git 还没有完全理解 git 的操作方法，直接跟着“Git安装与使用新手教程”跑，完全没有联想到vistual studio，在执行 `git clone<repo-url>`时才发现陷入了思维惯性。
+
+**解决：** 找到第一周项目计划书仔细阅读后，理解到 git bash 提供的作用。后需根据项目计划书和ai的帮助，一步步开始在vistual studio上创建项目工程。
+
+**现象2：** 远程仓库拉取问题。
+
+由于初次使用 git ，没有理解清楚仓库相关概念，后续在github上随机克隆到的本地仓库发现没有上传分支的权限，导致 commit 失败。
+
+**解决：** 在b站上学习了仓库和 git 的相关教程后，理解了git 、github 、vistual studio、vs code 的关联协作工作能力，学会了相关工具的使用方法。
+
+**现象3：** 远程仓库推送问题。
+
+使用 vs code 推送代码到 github 上的仓库时，推送失败，没有git ssl证书。
+
+**解决：** 把克隆 HTTPS 的方式改为使用 SSH 的方式，在 github 注册了一个 SSH 密钥，并将本地与远程链接改为 SSH 链接。
+
+### 8.2 MSVC 代码页 936 / UTF-8 问题（第 2 天）
 
 **现象：** `cl.exe` 报告了多个类似错误：
 
@@ -337,7 +363,7 @@ current source character set (codepage 936).
 
 **提交：** `28ad113` “fix: build: Add /utf-8 compiler flag for MSVC encoding”
 
-### 8.2 服务模式编译错误（第 4 天）
+### 8.3 服务模式编译错误（第 4 天）
 
 **现象：** 添加 `service_main.h` 后，工程产生 100+ 编译错误，包括：
 
@@ -359,7 +385,7 @@ current source character set (codepage 936).
 
 **提交：** `555b50f`、`b237f8b`、`35cfcf4`、`8c1984c`、`cde4f84`
 
-### 8.3 install.bat 编码与路径问题（第 4 天）
+### 8.4 install.bat 编码与路径问题（第 4 天）
 
 **现象 1：** `install.bat` 失败，报错：
 
@@ -382,7 +408,7 @@ current source character set (codepage 936).
 
 **定位：** 脚本未以管理员身份运行。
 
-**修复：** 在 `install.bat` 开头增加管理员检查：尝试向 `%SystemRoot%\System32` 写入临时文件。若失败，脚本以明确的 `[ERROR] This script must be run as Administrator.` 提示后中止。同时硬编码 `SC=C:\Windows\System32\sc.exe`，使脚本在 `sc` 不在当前 PATH 时也能工作。
+**修复：** 在 `install.bat` 开头增加管理员检查：尝试向 `%SystemRoot%\System32` 写入临时文件。若失败，脚本以明确的 `[ERROR] This script must be run as Administrator.` 提示后中止。同时硬编码 `SC=C:\Windows\System32\sc.exe`，使脚本在 `sc` 不在当前 PATH 时也能工作。并使用管理员打开CMD进行测试。
 
 **提交：** `484edb0`、`e770fe8`、`5e3fea6`
 
@@ -390,16 +416,16 @@ current source character set (codepage 936).
 
 ### 9.1 最熟悉的部分
 
-- C++ 基础语法、类、RAII、智能指针
-- `nlohmann/json` 库的使用（仅头文件、API 直观）
-- `std::thread` 和 `std::atomic` 并发编程
-- Windows 批处理脚本（变量、错误级别、`sc.exe`）
+- 基础语法、命令行模式、github 使用方式
+- 使用ai工具帮助项目计划实现
+- 能够使用 git 进行基本的拉取、提交、推送功能
+- 熟悉了 Vistual Studio 在工作流程中的使用方法
 
 ### 9.2 最需要练习的部分
 
-- **Windows API 细节：** `SERVICE_STATUS`、`SERVICE_TABLE_ENTRYW`、`RegisterServiceCtrlHandlerW`。A/W 分发宏多次让我出错。我应该复习 Windows SDK 头文件 `winsvc.h`，把宽字符与窄字符的区分内化。
-- **MSBuild / vcxproj 内部机制：** 我编辑了 `.vcxproj` 来加入 `/utf-8` 和配置包含路径。未来的项目应受益于一次性初始化脚本，从一开始就固化这些配置，而不是通过编译错误才发现。
-- **异步 / 取消模式：** 我的停止标志用的是简单的 `std::atomic<bool>` 每 200 毫秒轮询。对于真实生产代码，我应该学习正确的取消令牌（cancellation token）和条件变量。
+- **基本工作流程：** 多加练习 git 、 Vistual Studio 等相关工具的工作交互流程，深入掌握调试工具，理解项目配置文件结构。
+- **Windows 服务理解：** 深化对Windows 服务控制管理器的状态机机制的理解。
+- **基本项目意识：** 学会理解项目相关工具的基本使用方式和场景，学会看懂编写程序时的报错信息，学会记录任务中的关键节点以便于后续排查错误。
 
 ### 9.3 第二周计划
 
@@ -416,22 +442,21 @@ current source character set (codepage 936).
 | 文件名 | 类型 | 描述 |
 |---|---|---|
 | `README.md` | Markdown | 工程 README，构建与运行说明、常见问题 |
-| `docs/test_report.md` | Markdown | 完整测试报告（第 5 天），含逐步输出 |
+| `docs/test_report.md` | Markdown | 完整测试报告，含逐步输出 |
 | `docs/test_report_zh.md` | Markdown | 测试报告中文版 |
 | `docs/week1_summary.md` | Markdown | 本文件 |
 | `docs/week1_summary_zh.md` | Markdown | 本文件中文版 |
-| `docs/screenshots/` | 目录 | 最终测试运行时拍摄的截图（由实习生补充） |
+| `docs/screenshots/` | 目录 | 最终测试运行时拍摄的截图 |
 | `x64/Debug/DeviceConfigMonitorService.exe` | 二进制 | 编译产物（1.18 MB） |
 
 ### 截图检查清单
 
-- [ ] `docs/screenshots/git_status_clean.png`
-- [ ] `docs/screenshots/git_log.png`（`git log --oneline --graph`）
-- [ ] `docs/screenshots/console_mode.png`（心跳输出）
-- [ ] `docs/screenshots/config_missing.png`（自动生成）
-- [ ] `docs/screenshots/json_malformed.png`（优雅回退）
-- [ ] `docs/screenshots/service_query.png`（`sc query` STATE 4）
-- [ ] `docs/screenshots/service_log.png`（启动 + 心跳 + 停止）
-- [ ] `docs/screenshots/readme_rendered.png`（渲染后的 README）
+- [ ] ![运行截图](./screenshots/git_status_clean.png)
+- [ ] ![运行截图](./screenshots/git_log.png)（`git log --oneline --graph`）
+- [ ] ![运行截图](./screenshots/console_mode.png)（心跳输出）
+- [ ] ![运行截图](./screenshots/config_missing.png)（自动生成）
+- [ ] ![运行截图](./screenshots/json_malformed.png)（错误下回退）
+- [ ] ![运行截图](./screenshots/query.png)（`sc query` STATE 4）
+- [ ] ![运行截图](./screenshots/service_log.png)（启动 + 心跳 + 停止）
 
 报告结束。

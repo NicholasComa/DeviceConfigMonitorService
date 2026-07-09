@@ -11,7 +11,7 @@
 | 项目分支 | `week5-cpp-service` |
 | 仓库地址 | https://github.com/NicholasComa/DeviceConfigMonitorService |
 | 测试日期 | 2026-07-08 |
-| 测试人 | 第一周实习生 |
+| 测试人 | 肖顺志 |
 
 ## 2. 测试范围
 
@@ -55,7 +55,7 @@
 **步骤**
 
 1. 删除 `C:\ProgramData\NanningTraining\DeviceConfigMonitorService\config.json`。
-2. 运行 `DeviceConfigMonitorService.exe --console` 约 3 秒。
+2. 运行 `x64\Debug\DeviceConfigMonitorService.exe --console` 约 3 秒。
 3. 结束进程并检查文件系统。
 
 **预期：** 生成一个新的 `config.json`，内容为默认配置值。
@@ -83,7 +83,7 @@
 
 **结果：通过**
 
-#### 场景 B-2：JSON 格式错误 → 优雅回退，不崩溃
+#### 场景 B-2：JSON 格式错误 → 自动回退，不崩溃
 
 **步骤**
 
@@ -91,7 +91,7 @@
    ```json
    { "DeviceId": "BAD", "EnableHeartbeat": tru, "HeartbeatIntervalSeconds": }
    ```
-2. 运行 `DeviceConfigMonitorService.exe --console` 约 3 秒。
+2. 运行 `x64\Debug\DeviceConfigMonitorService.exe --console` 约 3 秒。
 3. 观察程序行为。
 
 **预期：** 程序记录一条错误日志，并使用默认配置继续运行；进程不会崩溃。
@@ -158,8 +158,8 @@ T4（DeviceId=T4）的心跳计数：0
 
 **步骤**
 
-1. 设置 `LogPath: C:\ProgramData\NanningTraining\DeviceConfigMonitorService\logs-test5`。
-2. 前置条件：该目录不存在。
+1. 设置 `LogPath: C:\ProgramData\NanningTraining\DeviceConfigMonitorService\logs`。
+2. 前置条件：该目录不存在或手动删除目录。
 3. 运行 `--console` 约 4 秒。
 4. 检查该目录。
 
@@ -168,9 +168,16 @@ T4（DeviceId=T4）的心跳计数：0
 **实际：**
 
 ```
-[Pre] Log dir exists? NO - good
-[Post] Log dir exists? YES - directory was auto-created
-[Post] Files: service-2026-07-08.log
+ 驱动器 C 中的卷是 Windows
+ 卷的序列号是 52CF-BDD3
+
+ C:\ProgramData\NanningTraining\DeviceConfigMonitorService\logs-test5 的目录
+
+2026/07/09  10:30    <DIR>          .
+2026/07/09  10:56    <DIR>          ..
+2026/07/09  10:30               577 service-2026-07-09.log
+               1 个文件            577 字节
+               2 个目录 229,016,842,240 可用字节
 ```
 
 **结果：通过**
@@ -190,19 +197,21 @@ T4（DeviceId=T4）的心跳计数：0
 **实际：**
 
 ```
-Test dir: "C:\Temp With Space"
+C:\Temp With Space>install.bat
 [install] Registering service...
   Service name : DeviceConfigMonitorService
+  Display name : Device Config Monitor Service
   Binary path  : C:\Temp With Space\..\..\x64\Debug\DeviceConfigMonitorService.exe
 [ERROR] Binary not found: C:\Temp With Space\..\..\x64\Debug\DeviceConfigMonitorService.exe
-ExitCode: 1
+Please build the project in Visual Studio first.
+
+C:\Temp With Space>uninstall.bat
 [uninstall] Removing service: DeviceConfigMonitorService
 [WARN] Service not found.
-ExitCode: 0
 ```
 
-`%~dp0` 正确展开为 `C:\Temp With Space\`（空格被保留）。
-“Binary not found”报错是预期的，因为我们没有把 exe 放到该相对位置；脚本的报错信息在含空格路径下也正常工作。
+`%~dp0` 正确展开为 `C:\Temp With Space\`（空格被保留）,无论脚本放在哪里，都能正确计算出相对路径 。
+“Binary not found”报错是预期的，因为没有把 .exe 放到该相对位置；脚本的报错信息在含空格路径下也正常工作。
 
 **结果：通过**
 
@@ -210,25 +219,26 @@ ExitCode: 0
 
 > **说明：** 服务模式测试（`install / start / query / stop / uninstall`）已在第 4 天的提交
 > `12f47d4`（“conf: app: Add service control scripts”）中执行并验证。完整的第 4 天测试记录
-> 包含在 `docs/day4_test_record.md`（第 4 天笔记）中，此处为完整起见做摘要。第 4 天的证据显示：
+> 包含在 `docs/day4_test_record.md`（第 4 天笔记）中，此处为完整起见做摘要。第 4 天的结果显示：
 > 安装成功、启动成功（STATE 4 RUNNING）、查询成功（ACCEPTS_SHUTDOWN/STOPPABLE）、停止成功（17 毫秒）、卸载成功。
 
 | 步骤 | 结果 | 证据 |
 |---|---|---|
-| `install.bat` | 通过 | `sc create` 成功；服务已注册 |
-| `start.bat` | 通过 | `sc start` 成功；服务进入 STATE 4 RUNNING |
-| `query.bat` | 通过 | `sc query` 显示 STATE 4 RUNNING，PID 30288 |
-| `stop.bat` | 通过 | `sc stop` 成功；服务从 STOP_PENDING 过渡到 STOPPED |
-| `uninstall.bat` | 通过 | `sc delete` 成功；服务从 SCM 移除 |
+| `install.bat` | 通过 | `sc create` 成功；服务已注册;![install 运行截图](./screenshots/install.png) |
+| `start.bat` | 通过 | `sc start` 成功；服务进入 STATE 2 START_PENDING;![start 运行截图](./screenshots/start.png) |
+| `query.bat` | 通过 | `sc query` 显示 STATE 4 RUNNING，PID 30288;![query 运行截图](./screenshots/query.png) |
+| `stop.bat` | 通过 | `sc stop` 成功；服务从 STOP_PENDING 过渡到 STOPPED;![stop 运行截图](./screenshots/stop.png) |
+| `uninstall.bat` | 通过 | `sc delete` 成功；服务从 SCM 移除;![uninstall 运行截图](./screenshots/uninstall.png) |
 | 写入启动日志 | 通过 | `service-2026-07-08.log` 中出现“Service starting up...”和“Heartbeat worker starting”记录 |
 | 写入停止日志 | 通过 | 出现“Stop signal received. Shutting down...”和“Service stopped.”记录 |
 | 停止后不再写日志 | 通过 | 停止后心跳计数冻结；在“Service stopped.”行之后不再出现新记录 |
+| ![日志 运行截图](./screenshots/service_log(1).png) |
 
 **结果：通过（8 项子检查全部通过）**
 
 ## 4. 遇到的问题
 
-本周遇到并解决了以下问题。此处作为测试报告的一部分列出；完整的复盘见 `docs/week1_summary.md` 第 8 节。
+本周遇到并解决了以下问题。此处作为测试报告的一部分列出；完整的复盘见 `docs/week1_summary_zh.md` 第 8 节,[点击查看测试详情](./week1_summary_zh.md#8-问题复盘)。
 
 | # | 问题 | 状态 |
 |---|---|---|
@@ -242,18 +252,17 @@ ExitCode: 0
 
 ## 5. 截图 / 证据索引
 
-以下文件应作为证据截图保存。实习生需在最终测试运行时拍摄这些截图，并放入 `docs/screenshots/`：
+以下文件应作为结果截图保存。在最终测试运行时拍摄的这些截图，放入了 `docs/screenshots/`：
 
 | 文件名 | 描述 | 来源 |
 |---|---|---|
-| `docs/screenshots/git_status_clean.png` | `git status` 显示工作树干净 | 第 5 天最终检查 |
-| `docs/screenshots/git_log.png` | `git log --oneline --graph` 输出 | 24 次提交 |
-| `docs/screenshots/console_mode.png` | `--console` 运行时带心跳输出 | 第 5 天 |
-| `docs/screenshots/config_missing.png` | config.json 自动生成 | 第 5 天测试 1 |
-| `docs/screenshots/json_malformed.png` | 错误 JSON 下的优雅回退 | 第 5 天测试 2 |
-| `docs/screenshots/service_query.png` | `sc query DeviceConfigMonitorService` STATE 4 RUNNING | 第 4 天 / 复测 |
-| `docs/screenshots/service_log.png` | 显示启动 + 心跳 + 停止的日志文件 | 第 5 天 |
-| `docs/screenshots/readme_rendered.png` | 渲染后的 README.md | 第 5 天 |
+| ![运行截图](./screenshots/git_status_clean.png) | `git status` 显示工作树干净 | 最终检查 |
+| ![运行截图](./screenshots/git_log.png) | `git log --oneline --graph` 输出 | commit提交 |
+| ![运行截图](./screenshots/console_mode.png) | `--console` 运行时带心跳输出 |    |
+| ![运行截图](./screenshots/config_missing.png) | config.json 自动生成 | 测试 1 |
+| ![运行截图](./screenshots/json_malformed.png) | 错误 JSON 下的回退 | 测试 2 |
+| ![运行截图](./screenshots/query.png) | `sc query DeviceConfigMonitorService` STATE 4 RUNNING | 复测 |
+| ![运行截图](./screenshots/service_log.png) | 显示启动 + 心跳 + 停止的日志文件 |    |
 
 > **说明：** 截图文件此处仅按文件名引用。实际的 PNG 文件由实习生在最终测试运行时拍摄，
 > 并在单独的提交中提交。
