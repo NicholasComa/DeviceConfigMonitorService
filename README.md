@@ -46,27 +46,36 @@ x64\Debug\DeviceConfigMonitorService.exe
 DeviceConfigMonitorService/
 +- DeviceConfigMonitorService.sln
 +- README.md
++- README_CN.md
 +- .gitignore
 +- .gitattributes
-+- x64/                           # Build output (gitignored)
++- x64/                          # 构建输出（已 gitignore）
 +- DeviceConfigMonitorService/
-   +- main.cpp                    # Entry point: --console or SCM dispatch
-   +- config.h / config.cpp       # AppConfig + JSON load/save
-   +- logger.h / logger.cpp       # Thread-safe Logger (Info/Warn/Error)
-   +- heartbeat_worker.h / .cpp   # Background heartbeat thread
-   +- service_main.h / .cpp       # ServiceMain / ServiceCtrlHandler
-   +- config.example.json         # Sample config file
+   +- src/                       # 源码（C++ 实现文件）
+   |  +- main.cpp                # 入口：--console 或 SCM 分发
+   |  +- config.cpp              # AppConfig + JSON 加载/保存
+   |  +- logger.cpp              # Logger
+   |  +- heartbeat_worker.cpp    # HeartbeatWorker
+   |  +- service_main.cpp        # ServiceMain + ServiceCtrlHandler
+   +- config.h                   # AppConfig 头文件（与 src/config.cpp 配对）
+   +- logger.h                   # 与 src/logger.cpp 配对
+   +- heartbeat_worker.h         # 与 src/heartbeat_worker.cpp 配对
+   +- service_main.h             # 与 src/service_main.cpp 配对
+   +- config.example.json        # 配置样例
    +- DeviceConfigMonitorService.vcxproj
    +- DeviceConfigMonitorService.vcxproj.filters
-   +- scripts/
-   |  +- install.bat              # sc create (Run as Administrator)
-   |  +- uninstall.bat            # sc delete
-   |  +- start.bat                # sc start
-   |  +- stop.bat                 # sc stop
-   |  +- query.bat                # sc query
-   +- third_party/
+   +- scripts/                   # 服务控制 .bat 文件
+   |  +- install.bat
+   |  +- uninstall.bat
+   |  +- start.bat
+   |  +- stop.bat
+   |  +- query.bat
+   +- docs/                      # 文档
+   |  +- test_report_zh.md
+   |  +- week1_summary_zh.md
+   +- third_party/               # 第三方依赖库
       +- nlohmann/
-         +- json.hpp              # nlohmann/json v3.12.0 (single header)
+         +- json.hpp             # nlohmann/json v3.12.0（仅头文件）
 ```
 
 | Module | Source Files | Role |
