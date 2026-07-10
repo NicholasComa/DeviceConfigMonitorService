@@ -37,7 +37,7 @@
 
 ## 2. Git 提交记录
 
-分支 `day5-cpp-service` 截至本报告前包含 30 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
+分支 `day5-cpp-service` 截至本报告前包含 37 次提交。以下是按用途分组的主要提交。完整日志可用 `git log --oneline --graph` 查看。
 
 ### 2.1 第 1 天 - 工程初始化
 

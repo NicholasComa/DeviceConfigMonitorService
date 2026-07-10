@@ -47,25 +47,33 @@ DeviceConfigMonitorService/
 +- README_CN.md
 +- .gitignore
 +- .gitattributes
-+- x64/                           # 构建输出（已忽略）
++- x64/                          # 构建输出（已 gitignore）
 +- DeviceConfigMonitorService/
-   +- main.cpp                    # 入口点：--console 或 SCM 分发
-   +- config.h / config.cpp       # AppConfig + JSON 加载/保存
-   +- logger.h / logger.cpp       # 线程安全日志记录器（Info/Warn/Error）
-   +- heartbeat_worker.h / .cpp   # 后台心跳线程
-   +- service_main.h / .cpp       # ServiceMain / ServiceCtrlHandler
-   +- config.example.json         # 示例配置文件
+   +- src/                       # 源码（C++ 实现文件）
+   |  +- main.cpp                # 入口：--console 或 SCM 分发
+   |  +- config.cpp              # AppConfig + JSON 加载/保存
+   |  +- logger.cpp              # Logger
+   |  +- heartbeat_worker.cpp    # HeartbeatWorker
+   |  +- service_main.cpp        # ServiceMain + ServiceCtrlHandler
+   +- config.h                   # AppConfig 头文件（与 src/config.cpp 配对）
+   +- logger.h                   # 与 src/logger.cpp 配对
+   +- heartbeat_worker.h         # 与 src/heartbeat_worker.cpp 配对
+   +- service_main.h             # 与 src/service_main.cpp 配对
+   +- config.example.json        # 配置样例
    +- DeviceConfigMonitorService.vcxproj
    +- DeviceConfigMonitorService.vcxproj.filters
-   +- scripts/
-   |  +- install.bat              # sc create（以管理员身份运行）
-   |  +- uninstall.bat            # sc delete
-   |  +- start.bat                # sc start
-   |  +- stop.bat                 # sc stop
-   |  +- query.bat                # sc query
-   +- third_party/
+   +- scripts/                   # 服务控制 .bat 文件
+   |  +- install.bat
+   |  +- uninstall.bat
+   |  +- start.bat
+   |  +- stop.bat
+   |  +- query.bat
+   +- docs/                      # 文档
+   |  +- test_report.md
+   |  +- week1_summary.md
+   +- third_party/               # 第三方依赖库
       +- nlohmann/
-         +- json.hpp              # nlohmann/json v3.12.0（单头文件）
+         +- json.hpp             # nlohmann/json v3.12.0（仅头文件）
 ```
 
 | 模块 | 源文件 | 作用 |

@@ -71,8 +71,8 @@ DeviceConfigMonitorService/
    |  +- stop.bat
    |  +- query.bat
    +- docs/                      # 文档
-   |  +- test_report_zh.md
-   |  +- week1_summary_zh.md
+   |  +- test_report.md
+   |  +- week1_summary.md
    +- third_party/               # 第三方依赖库
       +- nlohmann/
          +- json.hpp             # nlohmann/json v3.12.0（仅头文件）
