@@ -431,26 +431,14 @@ current source character set (codepage 936).
 - **Windows 服务理解：** 深化对Windows 服务控制管理器的状态机机制的理解。
 - **基本项目意识：** 学会理解项目相关工具的基本使用方式和场景，学会看懂编写程序时的报错信息，学会记录任务中的关键节点以便于后续排查错误。
 
-### 9.3 第二周计划
-
-| 主题 | 原因 |
-|---|---|
-| 事件日志（Event Log）集成 | 当前实现只写文件；生产服务还应收发 Windows 事件日志 |
-| 服务 ACL 加固 | 默认 `LocalSystem` 权限过宽；正确的 ACL 是服务完成其工作所需的最小权限 |
-| 配置文件监视 | 在不重启服务的情况下，在 config.json 变更时重新加载 |
-| 服务主体中更好的异常处理 | 当前若 `RunServiceBody` 中抛出未捕获异常，进程会静默终止；顶层 try/catch 应向事件日志报告有意义的错误 |
-| 单元测试 | 围绕 `LoadConfig` 和心跳间隔归一化添加小型 GoogleTest 或 Catch2 测试套件 |
-
 ## 10. 附件清单
 
 | 文件名 | 类型 | 描述 |
 |---|---|---|
 | `README.md` | Markdown | 工程 README，构建与运行说明、常见问题 |
-| `docs/test_report.md` | Markdown | 完整测试报告，含逐步输出 |
-| `docs/test_report_zh.md` | Markdown | 测试报告中文版 |
-| `docs/week1_summary.md` | Markdown | 本文件 |
+| `docs/test_report_zh.md` | Markdown | 完整测试报告中文版 |
 | `docs/week1_summary_zh.md` | Markdown | 本文件中文版 |
-| `docs/screenshots/` | 目录 | 最终测试运行时拍摄的截图 |
+| `docs/screenshots/` | 目录 | 测试运行时拍摄的截图 |
 | `x64/Debug/DeviceConfigMonitorService.exe` | 二进制 | 编译产物（1.18 MB） |
 
 ### 截图检查清单
