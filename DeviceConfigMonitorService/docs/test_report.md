@@ -246,6 +246,7 @@ C:\Temp With Space>uninstall.bat
 | 3 | 第 4 天服务模式存在多个编译错误（缺少 `<windows.h>`、A/W 签名不匹配、fallthrough 警告） | 已通过 5 个独立修复提交解决；最终构建干净 |
 | 4 | 含中文注释的 `.bat` 脚本被 GBK cmd.exe 误读为命令 | 已解决：将全部 5 个脚本改写为纯 ASCII |
 | 5 | 默认 `install.bat` 因 `sc` 不在 PATH 中而失败 | 已解决：硬编码 `%SC%=C:\Windows\System32\sc.exe` 并增加管理员检查 |
+| 6 | 解决方案出错，区域显示文件已卸载 | 已解决：将`.vcxproj`文件复原，再重新加载解决方案 |
 
 截至撰写本文时，没有未解决的问题。
 

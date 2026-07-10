@@ -416,6 +416,15 @@ current source character set (codepage 936).
 
 **提交：** `484edb0`、`e770fe8`、`5e3fea6`
 
+### 8.5 项目文件损坏（第 4 天）
+
+**现象 1：** 解决方案出错，区域显示文件已卸载。
+![解决方案出错](./screenshots/failed%20to%20load.png)
+
+**定位：** 检查文件更改前的其他操作，检查项目文件完整性，发现是`.vcxproj`文件丢失了。
+
+**修复：** 将`.vcxproj`文件复原，再重新加载解决方案。
+
 ## 9. 自我评估
 
 ### 9.1 最熟悉的部分
@@ -425,7 +434,7 @@ current source character set (codepage 936).
 - 能够使用 git 进行基本的拉取、提交、推送功能
 - 熟悉了 Visual Studio 在工作流程中的使用方法
 
-### 9.2 最需要练习的部分
+### 9.2 后续还需练习的部分
 
 - **基本工作流程：** 多加练习 git 、 Visual Studio 等相关工具的工作交互流程，深入掌握调试工具，理解项目配置文件结构。
 - **Windows 服务理解：** 深化对Windows 服务控制管理器的状态机机制的理解。
@@ -437,7 +446,7 @@ current source character set (codepage 936).
 |---|---|---|
 | `README.md` | Markdown | 工程 README，构建与运行说明、常见问题 |
 | `docs/test_report_zh.md` | Markdown | 完整测试报告中文版 |
-| `docs/week1_summary_zh.md` | Markdown | 本文件中文版 |
+| `docs/week1_summary_zh.md` | Markdown | 汇报文件中文版 |
 | `docs/screenshots/` | 目录 | 测试运行时拍摄的截图 |
 | `x64/Debug/DeviceConfigMonitorService.exe` | 二进制 | 编译产物（1.18 MB） |
 
